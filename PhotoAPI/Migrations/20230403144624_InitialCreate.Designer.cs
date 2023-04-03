@@ -12,7 +12,7 @@ using PhotoAPI.Models;
 namespace PhotoAPI.Migrations
 {
     [DbContext(typeof(PhotoContext))]
-    [Migration("20230331231911_InitialCreate")]
+    [Migration("20230403144624_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

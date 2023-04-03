@@ -2,6 +2,7 @@
 using Amazon.S3.Transfer;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Microsoft.Extensions.Configuration;
 
 namespace PhotoAPI.Services
 {
@@ -9,13 +10,22 @@ namespace PhotoAPI.Services
     {
 
 
-         string awsAccessKey = Environment.GetEnvironmentVariable(variable: "AWS_ACCESS_KEY")!;
-         string awsSecret = Environment.GetEnvironmentVariable(variable: "AWS_SECRET")!;
-         string bucketName = Environment.GetEnvironmentVariable(variable: "AWS_BUCKET_NAME")!;
-         string url = $"https://{Environment.GetEnvironmentVariable("AWS_BUCKET_NAME")}.s3.amazonaws.com";
+         private readonly string _awsAccessKey;
+        private readonly string _awsSecret;
+        private readonly string _bucketName;
+        private readonly string _url;
 
         public S3UploadService()
-        { 
+        {
+            var MyConfig = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            var awsAccessKey = MyConfig.GetValue<string>("AWS_ACCESS_KEY");
+            var awsSecret = MyConfig.GetValue<string>("AWS_SECRET");
+            var bucky = MyConfig.GetValue<string>("AWS_BUCKET_NAME");
+
+            _awsAccessKey = awsAccessKey;
+            _awsSecret = awsSecret;
+            _bucketName = bucky;
+            _url = $"https://{bucky}.s3.amazonaws.com";
         }
 
         public async Task<string> UploadPhoto(IFormFile photo, string photoName)
@@ -28,26 +38,26 @@ namespace PhotoAPI.Services
             {
                 InputStream = memoryStream,
                 Key = photoName,
-                BucketName = bucketName,
+                BucketName = _bucketName,
                 CannedACL = S3CannedACL.PublicRead
             };
 
-            using var client = new AmazonS3Client(awsAccessKey, awsSecret, Amazon.RegionEndpoint.USEast1);
+            using var client = new AmazonS3Client(_awsAccessKey, _awsSecret, Amazon.RegionEndpoint.USEast1);
 
             var transferUtility = new TransferUtility(client);
 
             await transferUtility.UploadAsync(uploadRequest);
 
-            return $"{url}/{photoName}";
+            return $"{_url}/{photoName}";
 
         }
 
         public async Task<string> DeletePhoto(string photoName)
         {
-            using var client = new AmazonS3Client(awsAccessKey, awsSecret, Amazon.RegionEndpoint.USEast1);
+            using var client = new AmazonS3Client(_awsAccessKey, _awsSecret, Amazon.RegionEndpoint.USEast1);
             DeleteObjectRequest req = new DeleteObjectRequest
             {
-                BucketName = bucketName,
+                BucketName = _bucketName,
                 Key = photoName
             };
             await client.DeleteObjectAsync(req);

@@ -5,14 +5,24 @@ namespace PhotoAPI.Services
 {
     public class PhotoService : IPhotoService
     {
-        private readonly IPhotoRespository? _photoRespository;
+        private readonly IPhotoRespository _photoRespository;
+
+        public PhotoService(IPhotoRespository photoRespository)
+        {
+            _photoRespository = photoRespository ?? throw new ArgumentNullException(nameof(photoRespository));
+        }
 
         public Task<Photo> Add(Photo photo)
         {
-            photo.Id = Guid.NewGuid();
-            return _photoRespository.Add(photo);
-        }
+            if (_photoRespository == null)
+            {
+                throw new ArgumentNullException(nameof(_photoRespository), "The photo repository is null.");
+            }
 
+            photo.Id = Guid.NewGuid();
+            var res = _photoRespository.Add(photo);
+            return res;
+        }
         public Task<Photo> FindByName(string name)
         {
             return _photoRespository.FindByName(name);

@@ -3,21 +3,33 @@ using PhotoAPI.Models;
 using PhotoAPI.Services;
 using PhotoAPI.Repository;
 using PhotoAPI;
+using Amazon.Util;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration
+        .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", true)
+            .AddEnvironmentVariables()
+            .Build();
 
 builder.Services.AddScoped<IPhotoRespository, PhotoRepository>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<IPhotoUploadService, S3UploadService>();
-
+//var config =
+//    new ConfigurationBuilder()
+//        .SetBasePath(Directory.GetCurrentDirectory())
+//        .AddJsonFile("appsettings.json", true)
+//        .AddEnvironmentVariables()
+//        .Build();
 //Connection String
 var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 if (connectionString == null)
     connectionString = builder.Configuration.GetConnectionString("photos");
 
 //Database Connection
-builder.Services.AddDbContext<PhotoContext>(options => options.UseSqlServer(connectionString));
-//                                                options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<PhotoContext>(options => 
+//                                              options.UseSqlServer(connectionString));
+                                                options.UseNpgsql(connectionString));
 
 // Add services to the container.
 builder.Services.AddControllers();

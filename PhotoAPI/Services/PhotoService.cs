@@ -5,7 +5,7 @@ namespace PhotoAPI.Services
 {
     public class PhotoService : IPhotoService
     {
-        private readonly IPhotoRespository _photoRespository;
+        private readonly IPhotoRespository? _photoRespository;
 
         public Task<Photo> Add(Photo photo)
         {

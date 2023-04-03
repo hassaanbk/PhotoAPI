@@ -8,21 +8,19 @@ namespace PhotoAPI.Services
     public class S3UploadService : IPhotoUploadService
     {
 
-        private readonly IConfiguration _configuration;
 
-        
+         string awsAccessKey = Environment.GetEnvironmentVariable(variable: "AWS_ACCESS_KEY")!;
+         string awsSecret = Environment.GetEnvironmentVariable(variable: "AWS_SECRET")!;
+         string bucketName = Environment.GetEnvironmentVariable(variable: "AWS_BUCKET_NAME")!;
+         string url = $"https://{Environment.GetEnvironmentVariable("AWS_BUCKET_NAME")}.s3.amazonaws.com";
 
-        public S3UploadService(IConfiguration configuration)
-        {
-            configuration = _configuration;
+        public S3UploadService()
+        { 
         }
 
         public async Task<string> UploadPhoto(IFormFile photo, string photoName)
         {
-            string awsAccessKey = "AKIARSTMEM43ZA5F3FLO";
-            string awsSecret = "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";
-            string bucketName = "photos-easyaccess";
-            string url = $"https://{Environment.GetEnvironmentVariable("AWS_BUCKET_NAME")}.s3.amazonaws.com";
+           
             await using var memoryStream = new MemoryStream();
             photo.CopyTo(memoryStream);
 
@@ -46,10 +44,6 @@ namespace PhotoAPI.Services
 
         public async Task<string> DeletePhoto(string photoName)
         {
-            string awsAccessKey = _configuration["AWSCredentials:AWS_ACCESS_KEY"].ToString();
-            string awsSecret = _configuration["AWSCredentials:AWS_SECRET"].ToString();
-            string bucketName = _configuration["AWSCredentials:AWS_BUCKET_NAME"].ToString();
-            string url = $"https://{Environment.GetEnvironmentVariable("AWS_BUCKET_NAME")}.s3.amazonaws.com";
             using var client = new AmazonS3Client(awsAccessKey, awsSecret, Amazon.RegionEndpoint.USEast1);
             DeleteObjectRequest req = new DeleteObjectRequest
             {

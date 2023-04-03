@@ -16,7 +16,8 @@ if (connectionString == null)
     connectionString = builder.Configuration.GetConnectionString("photos");
 
 //Database Connection
-builder.Services.AddDbContext<PhotoContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<PhotoContext>(options => options.UseSqlServer(connectionString));
+//                                                options.UseNpgsql(connectionString));
 
 // Add services to the container.
 builder.Services.AddControllers();

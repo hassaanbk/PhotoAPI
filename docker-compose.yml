@@ -1,6 +1,12 @@
 version: "3.9"
 
 services:
+  api:
+    image: hassaanbk/photoapi
+    ports: 
+    - 80:80
+    depends_on: 
+    - db
   db:
     image: postgres:15.2-alpine
     volumes:
